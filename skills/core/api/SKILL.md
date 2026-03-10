@@ -5,26 +5,26 @@ description: Integrate the Flaunch Web2 API to upload images, queue memecoin lau
 
 # Flaunch Web2 API Skill
 
-Use this skill when the user is integrating with `flaunch-web2-api`.
+Use this skill when the user is integrating with `flaunch-web2-api` 
 
-## What this API is
+## What This API Is
 
 This API is a backend wrapper around Flaunch flows. It adds:
 
-- REST endpoints for launch and manager operations
-- async queue processing via `jobId`
+- REST endpoints for launch/manager operations
+- async queue processing (`jobId`)
 - launch status polling
-- image upload, moderation, and IPFS storage
-- creator identity resolution via wallet, email, Twitter, or Farcaster
+- image upload + moderation + IPFS storage
+- creator identity resolution (wallet/email/twitter/farcaster)
 
-It is not a replacement for full SDK flexibility. For low-level transaction orchestration, use the SDK skill instead.
+It is not a replacement for full SDK flexibility. For low-level transaction orchestration, explicitly reference the SDK resources in the Reference Map below.
 
-## Supported chains
+## Supported Chains
 
-- Base Mainnet route slug: `base` (`8453`)
-- Base Sepolia route slug: `base-sepolia` (`84532`)
+- Base Mainnet route slug: `base` (chainId `8453`)
+- Base Sepolia route slug: `base-sepolia` (chainId `84532`)
 
-## Core endpoints
+## Core Endpoints
 
 - `GET /livez`
 - `POST /api/v1/upload-image`
@@ -33,7 +33,7 @@ It is not a replacement for full SDK flexibility. For low-level transaction orch
 - `POST /api/v1/{chain}/create-revenue-manager`
 - `POST /api/v1/{chain}/create-fee-split-manager`
 
-## Fast integration workflow
+## Fast Integration Workflow
 
 1. `POST /api/v1/upload-image` with `base64Image`
 2. Use returned `ipfsHash` as `imageIpfs`
@@ -42,50 +42,105 @@ It is not a replacement for full SDK flexibility. For low-level transaction orch
 5. Poll `GET /api/v1/launch-status/{jobId}` until `state` is `completed` or `failed`
 6. On completion, use `transactionHash` and `collectionToken`
 
-## High-signal launch rules
+## Launch Request Essentials
 
-- Required launch fields: `name`, `symbol`, `description`, `imageIpfs`
-- Creator identity must be supplied through one identity path such as `creatorAddress`, `creatorEmail`, `creatorTwitterUsername`, or `creatorFarcasterUsername`
-- Do not send conflicting manager options in one request
-- Fee split recipients are validated and resolved to wallet addresses
+Required fields:
 
-## Manager creation notes
+- `name`
+- `symbol`
+- `description`
+- `imageIpfs`
 
-### Revenue manager
+Creator identity options (pick one):
 
-- Route: `POST /api/v1/{chain}/create-revenue-manager`
-- high-signal inputs: recipient identity, `protocolFee` in basis points, optional owner override
+- `creatorAddress`
+- `creatorEmail`
+- `creatorTwitterUsername`
+- `creatorFarcasterUsername`
 
-### Fee split manager
+Treasury options:
 
-- Route: `POST /api/v1/{chain}/create-fee-split-manager`
-- high-signal inputs: owner identity, `recipients`, optional `creatorShare`, optional `ownerShare`, optional custom `split`
-- fee split constraints:
-  - max recipient limit applies
-  - if any recipient has custom `split`, all must
-  - total recipient splits must equal `10,000,000`
-  - duplicate resolved addresses are rejected
+- Do not send conflicting manager options in one request.
+- Fee split recipients are validated and resolved to wallet addresses.
 
-## Async semantics
+## Manager Workflows
 
-- `launch-memecoin` is queue-based and asynchronous
-- a `jobId` means the launch was accepted, not completed onchain
-- poll the status endpoint for final result
-- failed jobs may still include submitted tx context, so instruct users to verify onchain
+### Create Revenue Manager
 
-## Common failure modes
+Route:
 
-- `429` rate limiting: retry with backoff
-- moderation errors from image checks
-- route slug mismatch (`base-sepolia` here vs `baseSepolia` in SDK flows)
-- assuming the schema snapshot is more current than route implementation
+- `POST /api/v1/{chain}/create-revenue-manager`
 
-## Output expectations
+High-signal inputs:
+
+- recipient identity (wallet/email/twitter/farcaster)
+- `protocolFee` in basis points (`0` to `10000`)
+- optional owner override
+
+### Create Fee Split Manager
+
+Route:
+
+- `POST /api/v1/{chain}/create-fee-split-manager`
+
+High-signal inputs:
+
+- owner identity (wallet/email/twitter/farcaster)
+- `recipients` array (wallet/email/twitter/farcaster entries)
+- optional `creatorShare` / `ownerShare`
+- optional custom recipient `split` values
+
+Fee split constraints:
+
+- max recipients limit applies
+- if any recipient has custom `split`, all must
+- total recipient splits must equal `10,000,000` (100.00000%)
+- duplicate resolved addresses are rejected
+
+## Async Job Semantics (Important)
+
+- Launch is queue-based and asynchronous.
+- `launch-memecoin` returns quickly with `jobId`; it does not mean onchain completion.
+- Poll status endpoint for final result.
+- Failed jobs may still include submitted tx hash context; instruct users to verify onchain.
+
+## Error and Retry Guidance
+
+- Common error envelope: `{ success: false, error: "..." }`
+- Expect `429` rate-limiting; implement retry with backoff
+- Moderation errors can include detailed NSFW payloads
+- Route slug mismatch is common (`base-sepolia` vs SDK `baseSepolia`)
+
+## Do / Don't
+
+Do:
+
+- Store and track `jobId`
+- Poll until terminal state
+- Validate chain slug explicitly
+- Surface `transactionHash` and status to users
+
+Don't:
+
+- Assume synchronous launch completion
+- Mix incompatible manager options in one request
+- Assume schema file is always up-to-date with route implementation
+
+## Output Expectations
 
 When helping builders, include:
 
 1. exact endpoint path
 2. required request fields
-3. async handling via `jobId`
-4. one retry or failure pattern
-5. expected success fields such as `transactionHash`, `collectionToken`, and manager addresses when relevant
+3. async status handling using `jobId`
+4. one error/retry pattern (`429`, validation, failed job)
+5. expected success response fields (`transactionHash`, `collectionToken`, manager addresses when applicable)
+
+## Reference Map
+
+- API repository: [flaunch-web2-api](https://github.com/flayerlabs/flaunch-web2-api)
+- API README (raw): [README.md](https://raw.githubusercontent.com/flayerlabs/flaunch-web2-api/refs/heads/master/README.md)
+- API schema snapshot (raw): [serverApiSchema.json](https://raw.githubusercontent.com/flayerlabs/flaunch-web2-api/refs/heads/master/serverApiSchema.json)
+- SDK skill: [flaunch-sdk/SKILL.md](https://raw.githubusercontent.com/flayerlabs/flaunch-sdk/refs/heads/master/SKILL.md)
+- Route source: [src/api/routes](https://github.com/flayerlabs/flaunch-web2-api/tree/master/src/api/routes)
+- Application orchestration: [src/application/flaunch.ts](https://github.com/flayerlabs/flaunch-web2-api/blob/master/src/application/flaunch.ts)
