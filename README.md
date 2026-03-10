@@ -1,90 +1,121 @@
 # Flaunch Skills
 
-This repo stores the reusable Flaunch skills in one place so a developer can jump into the Flaunch ecosystem and build everything Flaunch has to offer.
+This repository contains the reusable skill files for developers building with Flaunch.
 
-## What Flaunch Infra Can Do
+Flaunch supports two primary outcomes:
 
-At a high level, Flaunch gives builders infrastructure for:
+- launch a token
+- build a launchpad
 
-- launching tokens
-- building launchpads
-- routing value after launch
-- attaching treasury behavior to launched tokens
-- integrating trading, liquidity, imports, and app UX through the SDK
-- integrating faster backend-driven launch flows through the Web2 API
+Those outcomes can be delivered through a lightweight integration path or through deeper protocol customization, depending on how much control the product needs over launch flow, treasury behavior, and post-launch value routing.
 
-Most builders come to Flaunch for one of two outcomes:
+## What Flaunch Provides
 
-1. launch a token
-2. build a launchpad
+Flaunch infrastructure supports:
 
-## What Flaunch Managers Are
+- token creation and launch flows
+- launchpad development on top of the SDK and API
+- trading, liquidity, imports, and app-side integration through the SDK
+- backend-driven launch flows through the Web2 API
+- treasury behavior attached to launched tokens through managers
+- project-specific launch flows through manager-aware wrapper zaps
 
-Flaunch managers are treasury-side contracts attached to launched tokens.
+## What Managers Do
 
-At a high level, managers let a builder define how launched-token value behaves after launch, for example:
+Flaunch managers are treasury-side contracts attached to launched tokens. They define what happens to value after launch.
+
+Managers can be used to:
 
 - route value to one or more recipients
-- control claim behavior
-- support staking-style or treasury-style flows
-- support buyback-oriented behavior
-- enforce project-specific post-launch value routing
+- control claim and payout behavior
+- support revenue, staking, or buyback-style flows
+- enforce project-specific treasury behavior after launch
 
-Builders do not need to know every manager name to understand the model. The important distinction is:
+If a product only needs token launch and standard launchpad behavior, the basic path is usually enough. If it needs custom treasury behavior or project-specific launch constraints, it belongs on the advanced path.
 
-- if you just want to launch tokens, stay on the basic path
-- if you want custom treasury or revenue behavior, you are in manager territory and should use the advanced path
+## Repository Layout
 
-## Layout
+This repository is organized into three groups:
 
-The repo is organized into three groups:
+| Path | Purpose | Use when... |
+|------|---------|-------------|
+| `skills/core` | Source-of-truth skills for the API, SDK, and manager surfaces. | You need full guidance for a specific Flaunch integration surface. |
+| `skills/basic` | Task-focused shortcuts for the fastest path to a finished build. | You want to launch tokens or build a standard launchpad with minimal decisions. |
+| `skills/advanced` | Task-focused skills for custom contract behavior. | You need custom managers, wrapper zaps, or deeper protocol control. |
 
-- `skills/core/api`, `skills/core/sdk`, `skills/core/manager`
-  - source-of-truth product-surface skills
-  - these hold the core guidance for each major Flaunch integration surface
-- `skills/basic`
-  - the lowest-parameter paths to a finished state
-  - mostly API and SDK-driven builder flows
-- `skills/advanced`
-  - manager-heavy or contract-heavy integrations
-  - anything that depends on treasury manager internals or custom wrapper zap behavior
+This README is the index. There is no standalone root skill file.
 
-There is no standalone root skill file. This README is the index.
+## Skill Index
 
-## Basic Skills
+### Core
 
-- `skills/basic/token-creation/SKILL.md`
-  - Smallest path to create a token.
-  - Defaults to the Web2 API fast path and includes the required IPFS/image step.
-- `skills/basic/token-launchpad/SKILL.md`
-  - Build a token launchpad on top of Flaunch.
-  - Decides whether the builder needs a basic launchpad or an advanced launchpad.
+| File | Purpose | Read when... |
+|------|---------|--------------|
+| `skills/core/api/SKILL.md` | Source-of-truth Web2 API skill. | You are building with backend-driven launch flows or need the API surface directly. |
+| `skills/core/sdk/SKILL.md` | Source-of-truth SDK skill. | You are building an app, launchpad, or integration on top of the SDK. |
+| `skills/core/manager/SKILL.md` | Source-of-truth manager skill. | You are building or reviewing treasury manager integrations and related contract behavior. |
 
-## Advanced Skills
+### Basic
 
-- `skills/advanced/manager-builder/SKILL.md`
-  - Treasury manager integration skill for Flaunch contracts.
-  - Covers manager selection, `initializeData` / `depositData`, custody, claims, buybacks, and test invariants.
-- `skills/advanced/manager-zap-wrapper/SKILL.md`
-  - Focused skill for custom manager wrapper zaps.
-  - Covers forcing manager defaults through `FlaunchZap`, binding launches to the intended manager, and the required test coverage.
+| File | Purpose | Read when... |
+|------|---------|--------------|
+| `skills/basic/token-creation/SKILL.md` | Fastest path to create a token. | You want the smallest set of steps and parameters to get a token launched, including the required image/IPFS flow. |
+| `skills/basic/token-launchpad/SKILL.md` | Launchpad decision skill. | You want to build a launchpad and need to determine whether a standard SDK/API build is sufficient or whether the product requires the advanced path. |
 
-## How To Use It
+### Advanced
 
-Pick the smallest skill that matches the task:
+| File | Purpose | Read when... |
+|------|---------|--------------|
+| `skills/advanced/manager-builder/SKILL.md` | Custom treasury manager build skill. | You need to design, integrate, or test manager-driven treasury behavior. |
+| `skills/advanced/manager-zap-wrapper/SKILL.md` | Custom wrapper zap skill for manager-based launches. | You need a launch flow that forces manager defaults through `FlaunchZap` or binds launches to a project-specific manager path. |
 
-- core Web2 API surface -> `skills/core/api/SKILL.md`
-- core SDK surface -> `skills/core/sdk/SKILL.md`
-- core manager surface -> `skills/core/manager/SKILL.md`
-- fastest token launch with minimal params -> `skills/basic/token-creation/SKILL.md`
-- deciding what kind of launchpad to build -> `skills/basic/token-launchpad/SKILL.md`
-- treasury manager building or review -> `skills/advanced/manager-builder/SKILL.md`
-- project-specific wrapper zap around a manager -> `skills/advanced/manager-zap-wrapper/SKILL.md`
+## Build Paths
 
-## Source Mapping
+### Basic Path
 
-These skills are derived from the existing Flaunch repos:
+Use the basic path when the goal is to:
+
+- launch a token with minimal parameters
+- build a standard launchpad on top of the existing API or SDK surfaces
+- ship quickly without custom treasury contracts
+
+This path typically produces:
+
+- a launched token
+- a standard launchpad experience
+- app integrations for trading, liquidity, and related token flows
+
+### Advanced Path
+
+Use the advanced path when the product needs:
+
+- custom treasury or revenue behavior after launch
+- buyback, staking, or project-specific payout logic
+- manager-bound launch flows
+- wrapper zaps that enforce manager defaults during launch
+
+This path typically produces:
+
+- a custom manager integration
+- a launchpad with project-specific treasury behavior
+- a launch flow that cannot be expressed through the standard API or SDK path alone
+
+## How To Use This Repository
+
+Start with the smallest skill that matches the task:
+
+- token creation with minimal inputs: `skills/basic/token-creation/SKILL.md`
+- launchpad scoping and build-path selection: `skills/basic/token-launchpad/SKILL.md`
+- direct API integration: `skills/core/api/SKILL.md`
+- direct SDK integration: `skills/core/sdk/SKILL.md`
+- manager design or integration: `skills/core/manager/SKILL.md`
+- advanced manager implementation: `skills/advanced/manager-builder/SKILL.md`
+- advanced wrapper zap implementation: `skills/advanced/manager-zap-wrapper/SKILL.md`
+
+## Source Repositories
+
+These skills are derived from the current Flaunch codebases:
 
 - SDK source: `/Users/raphaelnembhard/Projects/flayerlabs/flaunch-sdk`
-- Contracts manager source: `/Users/raphaelnembhard/Projects/flayerlabs/flaunch-contracts`
+- contracts source: `/Users/raphaelnembhard/Projects/flayerlabs/flaunch-contracts`
 - Web2 API source: `/Users/raphaelnembhard/Projects/flayerlabs/flaunch-web2-api`
