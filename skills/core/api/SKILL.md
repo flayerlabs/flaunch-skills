@@ -5,7 +5,7 @@ description: Integrate the Flaunch Web2 API to upload images, queue memecoin lau
 
 # Flaunch Web2 API Skill
 
-Use this skill when the user is integrating with `flaunch-web2-api` 
+Use this skill when the user is integrating with `flaunch-web2-api`.
 
 ## What This API Is
 
@@ -17,7 +17,7 @@ This API is a backend wrapper around Flaunch flows. It adds:
 - image upload + moderation + IPFS storage
 - creator identity resolution (wallet/email/twitter/farcaster)
 
-It is not a replacement for full SDK flexibility. For low-level transaction orchestration, explicitly reference the SDK resources in the Reference Map below.
+It is not a replacement for full SDK flexibility. For low-level transaction orchestration, use the SDK skill.
 
 ## Supported Chains
 
@@ -136,11 +136,6 @@ When helping builders, include:
 4. one error/retry pattern (`429`, validation, failed job)
 5. expected success response fields (`transactionHash`, `collectionToken`, manager addresses when applicable)
 
-## Reference Map
+## Related Skill
 
-- API repository: [flaunch-web2-api](https://github.com/flayerlabs/flaunch-web2-api)
-- API README (raw): [README.md](https://raw.githubusercontent.com/flayerlabs/flaunch-web2-api/refs/heads/master/README.md)
-- API schema snapshot (raw): [serverApiSchema.json](https://raw.githubusercontent.com/flayerlabs/flaunch-web2-api/refs/heads/master/serverApiSchema.json)
-- SDK skill: [flaunch-sdk/SKILL.md](https://raw.githubusercontent.com/flayerlabs/flaunch-sdk/refs/heads/master/SKILL.md)
-- Route source: [src/api/routes](https://github.com/flayerlabs/flaunch-web2-api/tree/master/src/api/routes)
-- Application orchestration: [src/application/flaunch.ts](https://github.com/flayerlabs/flaunch-web2-api/blob/master/src/application/flaunch.ts)
+- SDK skill: `../sdk/SKILL.md`
