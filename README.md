@@ -2,6 +2,20 @@
 
 This repository contains the reusable skill files for developers building with Flaunch.
 
+## Easy Install
+
+For a single install target, install the top-level `flaunch` skill from this repository.
+
+Example:
+
+```bash
+npx skills add https://github.com/flayerlabs/flaunch-skills --skill flaunch
+```
+
+That installs the umbrella router skill at `flaunch/SKILL.md`, which then directs Codex or compatible skill systems to the right deeper Flaunch skill for the task.
+
+If the installer only supports direct folder URLs, use the `flaunch/` folder rather than the repository root.
+
 Flaunch supports two primary outcomes:
 
 - Launch a token
@@ -65,20 +79,6 @@ Managers can be used to:
 If a product only needs token launch and standard launchpad behavior, the basic path is usually enough. If it needs custom treasury behavior or project-specific launch constraints, it belongs on the advanced path.
 
 ## How To Use This Repository
-
-### Easy Install
-
-For a single install target, install the top-level `flaunch` skill from this repository.
-
-Example:
-
-```bash
-npx skills add https://github.com/flayerlabs/flaunch-skills --skill flaunch
-```
-
-That installs the umbrella router skill at `flaunch/SKILL.md`, which then directs Codex or compatible skill systems to the right deeper Flaunch skill for the task.
-
-If the installer only supports direct folder URLs, use the `flaunch/` folder rather than the repository root.
 
 ### Direct Skill Install
 
