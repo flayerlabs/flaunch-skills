@@ -2,8 +2,6 @@
 
 This repository contains the reusable skill files for developers building with Flaunch.
 
-## Easy Install
-
 For a single install target, install the top-level `flaunch` skill from this repository.
 
 Example:
