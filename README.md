@@ -12,7 +12,7 @@ That installs the umbrella router skill at `flaunch/SKILL.md`, which then direct
 
 If the installer only supports direct folder URLs, use the `flaunch/` folder rather than the repository root.
 
-Flaunch supports two primary outcomes:
+## Flaunch supports two primary outcomes:
 
 - Launch a token
 - Build a launchpad
