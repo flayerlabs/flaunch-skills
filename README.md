@@ -66,6 +66,22 @@ If a product only needs token launch and standard launchpad behavior, the basic 
 
 ## How To Use This Repository
 
+### Easy Install
+
+For a single install target, install the top-level `flaunch` skill from this repository.
+
+Example:
+
+```bash
+npx skills add https://github.com/flayerlabs/flaunch-skills --skill flaunch
+```
+
+That installs the umbrella router skill at `flaunch/SKILL.md`, which then directs Codex or compatible skill systems to the right deeper Flaunch skill for the task.
+
+If the installer only supports direct folder URLs, use the `flaunch/` folder rather than the repository root.
+
+### Direct Skill Install
+
 Start with the smallest skill that matches the task:
 
 - Token creation with minimal inputs: `skills/basic/token-creation/SKILL.md`
