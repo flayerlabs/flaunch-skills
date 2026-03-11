@@ -7,6 +7,14 @@ description: Integrate @flaunch/sdk in TypeScript apps to read protocol data, la
 
 Use this skill when the user needs to build, debug, or review app code using `@flaunch/sdk`.
 
+This skill is the source-of-truth router for SDK work. Use `references/launchpad-flow.md` when the builder is assembling a launchpad or app flow around launches.
+
+## Example Prompts
+
+- Build a Flaunch launchpad in TypeScript on Base.
+- Show the SDK flow for launching then buying a token.
+- Help me debug a Base Sepolia chain mismatch in `@flaunch/sdk`.
+
 ## Staying Current
 
 - Treat [llms-full.txt](https://raw.githubusercontent.com/flayerlabs/flaunch-sdk/refs/heads/master/llms-full.txt) as the canonical extended SDK reference when available.
@@ -97,6 +105,12 @@ This skill is for SDK integration work, not product-specific ops runbooks.
 
 - In scope: app integration patterns, SDK method selection, quote/tx/event flows, Permit2 and liquidity workflows.
 - Out of scope by default: org-specific API backends, Discord/Twitter automations, private infra, and hardcoded manager addresses unless user explicitly asks.
+
+## Route By Task
+
+- launchpad or app integration flow: `references/launchpad-flow.md`
+- fastest backend-assisted launch with minimal decisions: route to `../api/SKILL.md`
+- custom treasury behavior at launch: route to `../manager/SKILL.md`
 
 ## Task Router (Intent -> Workflow -> Inputs -> Methods)
 

@@ -10,6 +10,18 @@ That installs the umbrella router skill at `flaunch/SKILL.md`, which then direct
 
 If the installer only supports direct folder URLs, use the `flaunch/` folder rather than the repository root.
 
+## Usage Examples
+
+Prompt the umbrella skill with the task you actually want done:
+
+- `Use flaunch: Launch a memecoin on Base with the fastest possible path.`
+- `Use flaunch: Help me choose whether this launchpad should use the API, SDK, or a custom manager.`
+- `Use flaunch: Integrate AddressFeeSplitManager so all fees route to this treasury contract.`
+- `Use flaunch: Build a TypeScript launch flow with @flaunch/sdk on Base Sepolia.`
+- `Use flaunch: Create a revenue manager through the Web2 API.`
+
+The umbrella skill should route those requests into the smallest matching token, launchpad, API, SDK, or manager skill.
+
 ## Flaunch supports two primary outcomes:
 
 - Launch a token
@@ -96,7 +108,7 @@ This repository is organized into three groups:
 | `skills/basic` | Task-focused shortcuts for the fastest path to a finished build. | You want to launch tokens or build a standard launchpad with minimal decisions. |
 | `skills/advanced` | Task-focused skills for custom contract behavior. | You need custom managers, wrapper zaps, or deeper protocol control. |
 
-This README is the index. There is no standalone root skill file.
+This README is the index. The install target for the repository is the umbrella router skill at `flaunch/SKILL.md`.
 
 ## Skill Index
 

@@ -7,15 +7,20 @@ description: Create a Flaunch token using the smallest path to finished state. P
 
 Use this skill when the user wants to create a token as quickly as possible.
 
-This is a task shortcut. Read `../../core/api/SKILL.md` for the full API surface when using the fast path, and read `../../core/sdk/SKILL.md` when the user needs the full direct-SDK launch path.
+This is a task shortcut. Use `references/api-fast-path.md` for the default execution route. Read `../../core/api/SKILL.md` for the full API surface and `../../core/sdk/SKILL.md` when the user needs direct SDK control.
+
+## Example Prompts
+
+- Launch a memecoin on Base with the fewest decisions possible.
+- Show me the fastest Flaunch token creation flow.
+- What do I need to create a token through the API?
 
 ## Default path
 
 Default to the Web2 API path because it requires fewer decisions and fewer parameters to reach a finished launch:
 
-1. upload image to IPFS with `POST /api/v1/upload-image`
-2. launch token with `POST /api/v1/{chain}/launch-memecoin`
-3. poll `GET /api/v1/launch-status/{jobId}`
+1. follow `references/api-fast-path.md`
+2. switch to the SDK skill only if the user needs direct launch control
 
 ## Why this is the default
 
@@ -50,5 +55,6 @@ Use the SDK path when the user needs:
 
 ## Related source skills
 
+- API fast path: `references/api-fast-path.md`
 - Full API guidance: `../../core/api/SKILL.md`
 - Full SDK guidance: `../../core/sdk/SKILL.md`

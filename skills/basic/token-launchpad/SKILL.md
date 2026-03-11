@@ -7,11 +7,17 @@ description: Decide what kind of Flaunch launchpad to build. Use the basic path 
 
 Use this skill when the user is building a launchpad product on top of Flaunch.
 
-This is a task shortcut. Read `../../core/sdk/SKILL.md` for the full SDK surface, read `../../core/api/SKILL.md` for the hosted Web2 API flow, and read `../../core/manager/SKILL.md` when the launchpad needs custom treasury behavior.
+This is a task shortcut. Use `references/path-selection.md` to classify the build path first. Then route to the smallest core or advanced skill that can finish the job.
+
+## Example Prompts
+
+- I want to build a launchpad on Flaunch. Which path should I use?
+- Decide whether my launchpad needs the API, SDK, or a custom manager.
+- Help scope a manager-bound Flaunch launchpad.
 
 ## First question: what kind of launchpad is this?
 
-Classify it before building.
+Use `references/path-selection.md` before writing code.
 
 ### Basic launchpad
 
@@ -70,6 +76,7 @@ If the user wants a simpler backend-driven launchpad with fewer parameters and n
 
 ## Related skills
 
+- path selection: `references/path-selection.md`
 - fast token creation: `../token-creation/SKILL.md`
 - full SDK guidance: `../../core/sdk/SKILL.md`
 - full API guidance: `../../core/api/SKILL.md`

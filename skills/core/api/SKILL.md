@@ -7,6 +7,8 @@ description: Integrate the Flaunch Web2 API to upload images, queue memecoin lau
 
 Use this skill when the user is integrating with `flaunch-web2-api`.
 
+This skill is a router plus checklist. Use the reference that matches the API task.
+
 ## What This API Is
 
 This API is a backend wrapper around Flaunch flows. It adds:
@@ -33,14 +35,18 @@ It is not a replacement for full SDK flexibility. For low-level transaction orch
 - `POST /api/v1/{chain}/create-revenue-manager`
 - `POST /api/v1/{chain}/create-fee-split-manager`
 
-## Fast Integration Workflow
+## Route By Task
 
-1. `POST /api/v1/upload-image` with `base64Image`
-2. Use returned `ipfsHash` as `imageIpfs`
-3. `POST /api/v1/{chain}/launch-memecoin`
-4. Save `jobId`
-5. Poll `GET /api/v1/launch-status/{jobId}` until `state` is `completed` or `failed`
-6. On completion, use `transactionHash` and `collectionToken`
+- standard token launch flow: `references/token-launch-flow.md`
+- fee split manager creation: `references/fee-split-manager-flow.md`
+- revenue manager creation: `references/revenue-manager-flow.md`
+- app-side launch, trade, liquidity, or watcher work: route to `../sdk/SKILL.md`
+
+## Example Prompts
+
+- Launch a token on Base through the Web2 API.
+- Show me the Flaunch API flow for creating a fee split manager.
+- What fields do I need for a revenue manager request on Base Sepolia?
 
 ## Launch Request Essentials
 
@@ -62,6 +68,16 @@ Treasury options:
 
 - Do not send conflicting manager options in one request.
 - Fee split recipients are validated and resolved to wallet addresses.
+
+## Unsupported Fit
+
+This skill is not the first choice when the builder needs:
+
+- direct wallet-driven launches
+- TypeScript SDK integration
+- trade, liquidity, import, or event watcher flows
+
+Route those requests to `../sdk/SKILL.md`.
 
 ## Manager Workflows
 
