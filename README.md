@@ -127,5 +127,5 @@ This README is the index. There is no standalone root skill file.
 These skills are derived from the current Flaunch codebases:
 
 - `flaunch-sdk`
-- `flaunch-contracts`
+- `flaunchgg-contracts`
 - `flaunch-web2-api`
