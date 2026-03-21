@@ -45,3 +45,4 @@ Read `../../core/manager/SKILL.md` for the full source-of-truth manager guidance
 
 - custom wrapper zap flow: `../manager-zap-wrapper/SKILL.md`
 - full manager guidance: `../../core/manager/SKILL.md`
+- manager type catalog: `../../core/manager/references/manager-types.md`

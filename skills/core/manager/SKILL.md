@@ -40,6 +40,7 @@ Choose the smallest manager path that matches the job:
 - fixed recipient routing: `references/address-fee-split-integration.md`
 - staking rewards: `references/staking-integration.md`
 - buyback policy: `references/buyback-integration.md`
+- manager catalog and init-shape reference: `references/manager-types.md`
 - custom manager implementation: `../../advanced/manager-builder/SKILL.md`
 - manager-bound launch wrapper: `../../advanced/manager-zap-wrapper/SKILL.md`
 

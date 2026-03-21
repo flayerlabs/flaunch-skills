@@ -14,8 +14,8 @@ Use the SDK instead when the builder needs client-side transaction control or de
 
 ## Supported Chains
 
-- `base`
-- `base-sepolia`
+- `base` (`8453`)
+- `base-sepolia` (`84532`)
 
 ## Required Inputs
 
@@ -25,6 +25,75 @@ Use the SDK instead when the builder needs client-side transaction control or de
 - `description`
 - image source that can be turned into `base64Image`
 - creator identity if attribution matters
+
+## Request Details
+
+### Upload Image
+
+Route:
+
+- `POST /api/v1/upload-image`
+
+Request body:
+
+```json
+{
+  "base64Image": "data:image/png;base64,..."
+}
+```
+
+High-signal constraints:
+
+- supported formats: PNG, JPEG, GIF, WebP
+- minimum size: `100x100`
+- maximum size: `10MB`
+- NSFW content is rejected
+- expect upload rate limiting around 4 uploads per minute per IP
+
+Expected success fields:
+
+- `success`
+- `ipfsHash`
+- `tokenURI`
+- optional moderation payload such as `nsfwDetection`
+
+### Launch Memecoin
+
+Route:
+
+- `POST /api/v1/{chain}/launch-memecoin`
+
+Minimum request body:
+
+```json
+{
+  "name": "My Token",
+  "symbol": "TOKEN",
+  "description": "A token launched through the Web2 API",
+  "imageIpfs": "Qm...",
+  "creatorAddress": "0x..."
+}
+```
+
+Useful optional fields:
+
+- `websiteUrl`
+- `discordUrl`
+- `twitterUrl`
+- `telegramUrl`
+
+Common field constraints:
+
+- `name`: max 32 characters
+- `symbol`: max 10 characters
+
+Expected submission response fields:
+
+- `success`
+- `message`
+- `jobId`
+- possible queue metadata such as `queueStatus.position` and `queueStatus.estimatedWaitSeconds`
+- creator resolution metadata such as `privy`
 
 ## Example Prompts
 
@@ -75,6 +144,8 @@ A complete answer should include:
 - moderation rejection on image upload
 - chain slug mismatch
 - failed async job after submission
+- malformed creator identity
+- invalid image format or image size
 
 ## Success Shape
 
@@ -84,3 +155,21 @@ Treat these as the high-signal outputs:
 - `state` during polling
 - `transactionHash` on completion
 - `collectionToken` on completion
+
+Example completed payload:
+
+```json
+{
+  "success": true,
+  "state": "completed",
+  "transactionHash": "0x...",
+  "collectionToken": {
+    "address": "0xNewTokenAddress",
+    "imageIpfs": "Qm...",
+    "name": "My Token",
+    "symbol": "TOKEN",
+    "tokenURI": "ipfs://Qm...",
+    "creator": "0xCreator"
+  }
+}
+```

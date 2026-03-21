@@ -69,6 +69,12 @@ Treasury options:
 - Do not send conflicting manager options in one request.
 - Fee split recipients are validated and resolved to wallet addresses.
 
+Useful launch detail:
+
+- optional social fields such as `websiteUrl`, `discordUrl`, `twitterUrl`, and `telegramUrl` may be included when the launch surface supports them
+- practical field limits commonly include `name` max 32 chars and `symbol` max 10 chars
+- image upload has format, size, moderation, and rate-limit constraints; see `references/token-launch-flow.md`
+
 ## Unsupported Fit
 
 This skill is not the first choice when the builder needs:
@@ -118,6 +124,7 @@ Fee split constraints:
 - Launch is queue-based and asynchronous.
 - `launch-memecoin` returns quickly with `jobId`; it does not mean onchain completion.
 - Poll status endpoint for final result.
+- queue metadata such as position and estimated wait may be returned on submission
 - Failed jobs may still include submitted tx hash context; instruct users to verify onchain.
 
 ## Error and Retry Guidance
