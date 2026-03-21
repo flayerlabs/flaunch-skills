@@ -36,6 +36,7 @@ Do not use this path as the default when the builder only wants the fastest back
 3. Verify `walletClient` and `publicClient` are on the same chain for any write flow.
 4. Choose the smallest workflow that satisfies the request:
    - launch
+   - manager-aware launch
    - trade
    - Permit2 sell
    - liquidity
@@ -48,9 +49,27 @@ Do not use this path as the default when the builder only wants the fastest back
 ## Launch Checklist
 
 - use `flaunchIPFS(...)` for the common launch path
+- use `flaunchIPFSWithRevenueManager(...)` when launching directly into a revenue manager instance
+- use `flaunchIPFSWithSplitManager(...)` for a static address-split launch path
+- use `flaunchIPFSWithDynamicSplitManager(...)` when recipient membership or share weights must stay mutable after launch
 - provide valid metadata including a base64 image
 - parse the launch result with `getPoolCreatedFromTx(...)`
 - if parsing is delayed, fall back to `pollPoolCreatedNow(...)`
+
+## Manager-Aware SDK Flows
+
+Use these when the launch should be manager-bound but the builder still wants an SDK-first TypeScript path:
+
+- deploy revenue manager: `deployRevenueManager(...)`
+- launch into a revenue manager instance: `flaunchWithRevenueManager(...)` or `flaunchIPFSWithRevenueManager(...)`
+- launch with static split manager: `flaunchWithSplitManager(...)` or `flaunchIPFSWithSplitManager(...)`
+- launch with dynamic split manager: `flaunchWithDynamicSplitManager(...)` or `flaunchIPFSWithDynamicSplitManager(...)`
+- inspect or update dynamic split state: `ReadDynamicAddressFeeSplitManager` / `ReadWriteDynamicAddressFeeSplitManager`
+
+High-signal distinction:
+
+- static split manager uses recipient percentages that the SDK converts into 5-decimal shares
+- dynamic split manager uses raw recipient weights and keeps those weights mutable after deployment
 
 ## Launchpad Guardrails
 

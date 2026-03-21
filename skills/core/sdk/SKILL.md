@@ -1,6 +1,7 @@
 ---
 name: flaunch-sdk
 description: Integrate @flaunch/sdk in TypeScript apps to read protocol data, launch coins, trade, manage Permit2 approvals, add liquidity, import tokens, and monitor events on Base and Base Sepolia.
+version_checked: 0.9.20
 ---
 
 # Flaunch SDK Skill
@@ -64,6 +65,7 @@ Use `ReadWriteFlaunchSDK` typing only when you specifically need write methods.
 ### Launch essentials (high-signal details)
 
 - Common launch path: `flaunchIPFS(...)`
+- Manager-aware launch paths include `flaunchIPFSWithRevenueManager(...)`, `flaunchIPFSWithSplitManager(...)`, and `flaunchIPFSWithDynamicSplitManager(...)`
 - Launch metadata image should be a valid base64 data URL (`data:image/...;base64,...`)
 - Typical post-launch parse step: `getPoolCreatedFromTx(hash)`
 - If parsing is delayed, use `pollPoolCreatedNow(...)`
@@ -111,6 +113,7 @@ This skill is for SDK integration work, not product-specific ops runbooks.
 - launchpad or app integration flow: `references/launchpad-flow.md`
 - fastest backend-assisted launch with minimal decisions: route to `../api/SKILL.md`
 - custom treasury behavior at launch: route to `../manager/SKILL.md`
+- SDK-managed revenue and split-manager launch flows still belong here when the user wants direct TypeScript integration rather than contract-level manager implementation work
 
 ## Task Router (Intent -> Workflow -> Inputs -> Methods)
 
@@ -326,6 +329,12 @@ Use this as a fast routing table before searching docs.
 - Read market/price context: `getMarketContext`, `coinPriceInETH`, `coinPriceInUSD`, `coinMarketCapInUSD`
 - Read fair launch state: `getFairLaunch`, `fairLaunchInfo`, `isFairLaunchActive`
 - Launch coin: `flaunchIPFS`, `flaunch`, `flaunchIPFSWithRevenueManager`, `flaunchIPFSWithSplitManager`
+- Launch coin with dynamic split manager: `flaunchWithDynamicSplitManager`, `flaunchIPFSWithDynamicSplitManager`
+- Deploy revenue manager instance: `deployRevenueManager`
+- Read revenue manager state: `getRevenueManagerBalances`, `getRevenueManagerProtocolBalances`, `getRevenueManagerTokensCount`, `getRevenueManagerAllTokensByCreator`, `getRevenueManagerAllTokensInManager`
+- Claim revenue manager fees: `revenueManagerProtocolClaim`, `revenueManagerCreatorClaim`, `revenueManagerCreatorClaimForTokens`
+- Read dynamic split manager state: `ReadDynamicAddressFeeSplitManager`, `allRecipients`, `recipientCount`, `recipientAt`, `recipients`, `totalActiveShares`
+- Write dynamic split manager state: `ReadWriteDynamicAddressFeeSplitManager`, `updateRecipients`, `setModerator`, `transferRecipientShare`, `claimForData`
 - Parse launch result: `getPoolCreatedFromTx`, `pollPoolCreatedNow`, `watchPoolCreated`
 - Buy quote: `getBuyQuoteExactInput`, `getBuyQuoteExactOutput`
 - Sell quote: `getSellQuoteExactInput`
@@ -608,18 +617,26 @@ Detailed steps:
    - `name`, `symbol`, `creator`
    - `initialMarketCapUSD`
    - fair launch config (`fairLaunchPercent`, `fairLaunchDuration`)
-   - fee allocation (`creatorFeeAllocationPercent` or split manager path)
+   - fee allocation (`creatorFeeAllocationPercent` or manager-aware launch path)
    - metadata payload (image + description; socials optional)
 2. Validate metadata image:
    - use a base64 data URL (e.g. `data:image/png;base64,...`)
    - reject empty/partial strings before write
 3. Execute one of:
    - `flaunchIPFS` (common path)
-   - `flaunchIPFSWithRevenueManager` / `flaunchIPFSWithSplitManager` when needed
+   - `flaunchIPFSWithRevenueManager` when launching directly into an existing revenue manager instance
+   - `flaunchIPFSWithSplitManager` when using the static split-manager path
+   - `flaunchIPFSWithDynamicSplitManager` when recipient membership or share weights must remain mutable after launch
 4. Parse tx result:
    - `getPoolCreatedFromTx(hash)`
    - return `memecoin`, `tokenId`, and key launch metadata
 5. If parse is not immediately available, use `pollPoolCreatedNow` as fallback.
+
+Manager-aware launch notes:
+
+- `flaunchWithSplitManager` normalizes recipient percentages into 5-decimal shares
+- `flaunchWithDynamicSplitManager` expects raw recipient weights, validates duplicate recipients, and requires a nonzero `moderator`
+- `deployRevenueManager` creates a manager instance before launch; `flaunchWithRevenueManager` launches directly into that instance
 
 Minimal pattern:
 
