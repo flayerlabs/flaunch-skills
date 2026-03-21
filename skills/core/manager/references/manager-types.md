@@ -64,6 +64,71 @@ bytes memory initializeData = abi.encode(
 );
 ```
 
+High-signal behavior:
+
+- recipient shares are fixed at initialization
+- recipient share totals must equal `100_00000`
+- individual recipients can transfer their full share allocation to another address
+
+## DynamicAddressFeeSplitManager
+
+Best fit:
+
+- evolving recipient membership
+- changing fee weights over time
+- operator-managed fee routing with optional moderator access
+
+Initialize shape:
+
+```solidity
+struct InitializeParams {
+    uint creatorShare;
+    uint ownerShare;
+    address moderator;
+    RecipientShare[] recipientShares;
+}
+
+struct RecipientShare {
+    address recipient;
+    uint share;
+}
+```
+
+Example:
+
+```solidity
+DynamicAddressFeeSplitManager.RecipientShare[] memory recipientShares =
+    new DynamicAddressFeeSplitManager.RecipientShare[](2);
+
+recipientShares[0] = DynamicAddressFeeSplitManager.RecipientShare({
+    recipient: treasury,
+    share: 1
+});
+
+recipientShares[1] = DynamicAddressFeeSplitManager.RecipientShare({
+    recipient: ops,
+    share: 3
+});
+
+bytes memory initializeData = abi.encode(
+    DynamicAddressFeeSplitManager.InitializeParams({
+        creatorShare: 20_00000,
+        ownerShare: 0,
+        moderator: moderator,
+        recipientShares: recipientShares
+    })
+);
+```
+
+High-signal behavior:
+
+- recipient `share` values are weights, not percentages out of `100_00000`
+- the example `1` and `3` values are just a simple ratio example; they mean `1 / (1 + 3)` and `3 / (1 + 3)`
+- recipients can be added, removed, and updated after initialization
+- removed recipients keep already-accrued fees
+- newly added recipients do not inherit historical fees
+- queued fees can accrue while no recipients are active and become claimable later when recipients are added back
+
 ## StakingManager
 
 Best fit:
@@ -166,6 +231,7 @@ Important:
 
 - this manager does not use the `FeeSplitManager` share model
 - do not treat `protocolFee` as a 5-decimal percentage
+- creators can claim all deposited creator tokens or an explicit subset
 
 ## ERC721OwnerFeeSplitManager
 
@@ -214,12 +280,14 @@ High-signal behavior:
 
 - claims require ownership proof at claim time
 - each collection splits its allocated share across its configured supply model
+- invalid `totalSupply`, zero share, or zero collection address should be treated as invalid initialization
 
 ## Selection Guide
 
 | Goal | Manager |
 |---|---|
 | fixed recipient routing | `AddressFeeSplitManager` |
+| dynamic membership or adjustable share weights | `DynamicAddressFeeSplitManager` |
 | staker rewards | `StakingManager` |
 | automated buybacks | `BuyBackManager` |
 | creator + protocol revenue split | `RevenueManager` |
@@ -228,6 +296,9 @@ High-signal behavior:
 ## Related References
 
 - `address-fee-split-integration.md`
+- `dynamic-address-fee-split-integration.md`
 - `staking-integration.md`
 - `buyback-integration.md`
+- `revenue-manager-integration.md`
+- `erc721-owner-fee-split-integration.md`
 - `../../advanced/manager-builder/SKILL.md`

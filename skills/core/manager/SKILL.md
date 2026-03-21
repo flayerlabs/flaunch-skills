@@ -38,8 +38,11 @@ Before coding, identify:
 Choose the smallest manager path that matches the job:
 
 - fixed recipient routing: `references/address-fee-split-integration.md`
+- dynamic recipient routing: `references/dynamic-address-fee-split-integration.md`
 - staking rewards: `references/staking-integration.md`
 - buyback policy: `references/buyback-integration.md`
+- protocol revenue split: `references/revenue-manager-integration.md`
+- NFT-holder fee sharing: `references/erc721-owner-fee-split-integration.md`
 - manager catalog and init-shape reference: `references/manager-types.md`
 - custom manager implementation: `../../advanced/manager-builder/SKILL.md`
 - manager-bound launch wrapper: `../../advanced/manager-zap-wrapper/SKILL.md`
@@ -47,6 +50,10 @@ Choose the smallest manager path that matches the job:
 Default direct-routing choice:
 
 - `AddressFeeSplitManager` with `recipientShares = [(recipientContract, 100_00000)]`
+
+Default dynamic-routing choice:
+
+- `DynamicAddressFeeSplitManager` when recipient membership or share weight must change after deployment
 
 ## Common Integration Baseline
 
@@ -69,6 +76,7 @@ Most manager integrations should follow this sequence:
 - For new integrations, set `initialTokenFairLaunch = 0` and `fairLaunchDuration = 0`.
 - Prefer Flaunch harnesses in `lib/flaunchgg-contracts` over copying large files.
 - Use `scripts/encode-address-fee-split.sh` when a single-recipient fee-split payload is needed quickly.
+- Prefer live manager tests in `flaunch-contracts/test/treasury/managers` as the implementation-detail source of truth when behavior is unclear.
 
 ## Out of Scope
 

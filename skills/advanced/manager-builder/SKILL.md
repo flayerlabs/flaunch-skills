@@ -23,6 +23,7 @@ Read `../../core/manager/SKILL.md` for the full source-of-truth manager guidance
 | Goal | Manager |
 |---|---|
 | fixed recipient split | `AddressFeeSplitManager` |
+| dynamic recipient split | `DynamicAddressFeeSplitManager` |
 | staking rewards | `StakingManager` |
 | buyback routing | `BuyBackManager` |
 | creator + protocol split | `RevenueManager` |
@@ -40,6 +41,7 @@ Read `../../core/manager/SKILL.md` for the full source-of-truth manager guidance
 - fee balances come from registered escrow sources, not ad hoc local balances
 - deposited Flaunch NFTs are custodied by the manager contract
 - manager tests should prove happy path, failure path, accounting invariants, and no-double-claim behavior
+- when manager behavior is nuanced, prefer the public `flaunchgg-contracts` manager docs and tests when they exist; otherwise keep guidance high level and avoid pointing users at private repos
 
 ## Related skill
 
