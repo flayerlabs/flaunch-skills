@@ -57,6 +57,14 @@ If the user needs a launch flow that forces manager defaults through a wrapper z
 
 - `../skills/advanced/manager-zap-wrapper/SKILL.md`
 
+### Game Mode port
+
+If the user wants to port, retrofit, or game-mode-enable an existing open-source browser game so it attaches to a token launch (coin metadata, chart, buying, launch framing), use:
+
+- `../skills/advanced/port-game-mode/SKILL.md`
+
+For building a Game Mode from scratch or changing rules in an existing one, use the `build-game-mode` skill shipped inside the `@flayerlabs/gamemode-cli` npm package instead.
+
 ## Routing Rules
 
 - Start with the smallest skill that can finish the task.
