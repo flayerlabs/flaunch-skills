@@ -4,6 +4,10 @@ The SDK surfaces (metadata, chart, buy) are the mechanical half of a port. This 
 the half that makes it a *launch*. Every item is required; the QA harness asserts the
 `data-gm-*` contract, and a human reviews the screenshots for the rest.
 
+**Corner inventory first:** before parking the coin card, list what the game's own HUD
+already owns (roadbooks, minimaps, debug readouts live in corners too). A port that covers
+the game's instruments reads as broken; move the card, or retire the instrument it replaces.
+
 **The DOM contract:** each item names required `data-gm-*` attributes. Put them on whatever
 elements your design uses — the harness queries attributes, not classes or structure, so the
 visual language stays yours. All coin-panel attributes (`data-ticker`, `data-alloc`,
@@ -31,10 +35,16 @@ tip-off/opening, and the moment it opens is announced. The rules already refuse 
 (`game.not_open`) — the client's job is to frame the wait so the refusal copy is never the
 player's first hint.
 
+**The open is a restart, not a continuation.** A player mid-action when the round opens must
+not simply keep going with the counter switched on — at `opensAt` reset the play space to a
+clean start state (back to the start line / a fresh board / a standstill grid, rivals
+included) and run a short 3-2-1-GO countdown beat into it. Practice progress visibly does not
+carry over; the round begins the way the game's own matches begin.
+
 - Contract: `data-gm-practice` on the practice indicator (present before `opensAt`, gone
-  after); `data-gm-tipoff` on the countdown element.
-- Accept: before `opensAt` the player sees PRACTICE + countdown; at `opensAt` a clear "it
-  counts now" beat plays.
+  after); `data-gm-tipoff` on the countdown element; `data-gm-go` on the 3-2-1-GO beat.
+- Accept: before `opensAt` the player sees PRACTICE + countdown; at `opensAt` the game
+  resets to its start state and a GO beat launches the round — never a silent continuation.
 
 ## 3. Round timer + end screen
 
@@ -84,7 +94,21 @@ unbranded. Re-dress if launch facts resolve late (`room.launch.subscribe`).
 - Contract: none the harness can see — this one is screenshot review only.
 - Accept: a mid-round screenshot shows the coin without the HUD.
 
-## 7. Buy choreography
+## 7. Input parity — phones exist
+
+A coin launch page gets phone traffic, so decide the port's device story EXPLICITLY. Either
+ship touch controls — a drive stick on one half of the screen writing ANALOG values past the
+game's key-ramp shaping, camera drag on the other half, input-conditional tutorial copy — or
+declare desktop-only visibly in the game (a copy line at boot), never silently broken. If
+touch ships: re-check every HUD corner at phone sizes (the coin card, the speedo and the
+stick all fight for the same corners), and verify with emulated touch that a drag actually
+drives — pointer-type gates and key-ramp overrides are exactly where it breaks quietly.
+
+- Contract: none new — the existing `data-gm-*` elements must remain visible and
+  non-overlapping at 390 px-class viewports when touch controls are on.
+- Accept: an emulated-phone run can drive, steer, look around, read the timer and BUY.
+
+## 8. Buy choreography
 
 BUY is sprung at a beat — a reveal, the end screen, a last call — and warned before it
 opens a wallet. Render `signing`/`pending` as a visible status, never a blocking modal;
