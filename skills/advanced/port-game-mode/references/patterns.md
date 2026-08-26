@@ -72,13 +72,17 @@ per marker), even when that means bypassing the game's own scoring events. Playt
 physically-marked events over frequent invisible ones — three $20 gates beat ten radius
 pings.
 
-## Wayfinding is screen-space
+## Wayfinding: a world-space plane with a constrained billboard
 
-If the port adds a "where do I go" pointer, draw it as a flat screen-space HUD arrow —
-project a point above the player, rotate by (bearing-to-target − camera yaw). Every 3D
-arrow mesh tried degenerated at some camera angle (a cone dead-ahead is a diamond; a flat
-extrusion side-on is a slab). Register the projection AFTER the game's camera system updates,
-or the arrow rides a frame behind.
+If the port adds a "where do I go" pointer, the playtested winner is a big flat arrow
+(canvas-textured plane, thick dark outline) floating above the player IN THE WORLD, yawed at
+the target — direction reads the way a painted road arrow does. Two failure modes and their
+fixes, all tried: solid 3D meshes (cones, extrusions) degenerate at some camera angle; a
+screen-space HUD arrow is legible but ambiguous (rotation on the glass doesn't say which dune
+to aim at). The plane needs a CONSTRAINED BILLBOARD: the tip's world direction is sacred, but
+roll the face toward the camera about the pointing axis, plus a small fixed nose-down for the
+dead-ahead case a plane can never face. Expect to flip the roll sign once — verify with an
+abeam-target screenshot, not by reasoning.
 
 ## Games that don't free-run headless
 
