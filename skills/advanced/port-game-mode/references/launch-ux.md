@@ -31,10 +31,16 @@ tip-off/opening, and the moment it opens is announced. The rules already refuse 
 (`game.not_open`) — the client's job is to frame the wait so the refusal copy is never the
 player's first hint.
 
+**The open is a restart, not a continuation.** A player mid-action when the round opens must
+not simply keep going with the counter switched on — at `opensAt` reset the play space to a
+clean start state (back to the start line / a fresh board / a standstill grid, rivals
+included) and run a short 3-2-1-GO countdown beat into it. Practice progress visibly does not
+carry over; the round begins the way the game's own matches begin.
+
 - Contract: `data-gm-practice` on the practice indicator (present before `opensAt`, gone
-  after); `data-gm-tipoff` on the countdown element.
-- Accept: before `opensAt` the player sees PRACTICE + countdown; at `opensAt` a clear "it
-  counts now" beat plays.
+  after); `data-gm-tipoff` on the countdown element; `data-gm-go` on the 3-2-1-GO beat.
+- Accept: before `opensAt` the player sees PRACTICE + countdown; at `opensAt` the game
+  resets to its start state and a GO beat launches the round — never a silent continuation.
 
 ## 3. Round timer + end screen
 
