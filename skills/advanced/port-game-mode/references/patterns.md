@@ -190,6 +190,25 @@ And support URL params: `?practice=SECONDS` (practice window length) and `?round
   (same count, stash your changes), then allowlist that exact message prefix in qa.mjs with
   a comment recording the verification — never blanket-ignore console errors.
 
+## Feel layers over simulation
+
+When a reviewer asks for game-feel the simulation does not model (gear changes over a CVT,
+recoil, weight shifts), reach for INPUT SHAPING + AUDIO before physics surgery: derive the
+stepped state from observable sim values (speed bands with hysteresis), play a sound on each
+transition, and express the physical consequence as a brief input modification (a 240 ms
+throttle cut) — the real simulation then produces the audible/visible response itself. Two
+rules from practice: time such effects in FIXED-STEP TICKS, never wall-clock (under a stepped
+QA harness a 240 ms wall cut lasts whole sim-seconds), and gate them on context the sim knows
+(no cut when coasting, airborne or descending). Snap silently across multi-step jumps —
+a respawn should not machine-gun five shift sounds.
+
+## Tame the offending frequency, don't duck everything
+
+"The sound at X is grating" usually traces to ONE synthesis constant — find the component
+(bandpass centre, harmonic knee, rate map) and retune it, rather than lowering buses. A
+procedural whistle proportional to speed, a brightness knee at held rpm: each was a one-line
+retune once identified, and each sounded like a redesign.
+
 ## Event-sound layer over game audio
 
 Ports earn new beats the game never had (claims, buys, countdowns). Give them their own tiny

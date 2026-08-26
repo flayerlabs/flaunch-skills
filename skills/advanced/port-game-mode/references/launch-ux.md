@@ -105,7 +105,9 @@ stick all fight for the same corners), and verify with emulated touch that a dra
 drives — pointer-type gates and key-ramp overrides are exactly where it breaks quietly.
 
 - Contract: none new — the existing `data-gm-*` elements must remain visible and
-  non-overlapping at 390 px-class viewports when touch controls are on.
+  non-overlapping at 390 px-class viewports when touch controls are on. Put the mobile
+  media-query overrides LAST in the framing stylesheet: an equal-specificity base rule
+  appended later silently wins, and the override "applies" while changing nothing.
 - Accept: an emulated-phone run can drive, steer, look around, read the timer and BUY.
 
 ## 8. Buy choreography
