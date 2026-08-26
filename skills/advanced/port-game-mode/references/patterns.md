@@ -146,6 +146,20 @@ window.__gm = {
 And support URL params: `?practice=SECONDS` (practice window length) and `?round=SECONDS`
 (window length) — mock-only, so short rounds and instant tip-offs are reachable in tests.
 
+## Framing DOM gotchas (learned the hard way)
+
+- A container styled `display: grid/flex` silently defeats the `hidden` attribute — the UA's
+  `display: none` loses the cascade. Always include `[hidden] { display: none !important; }`
+  (or equivalent) in the framing stylesheet, or every overlay "hides" while staying visible.
+- In-world coin branding on three.js: do NOT create an empty `THREE.Texture` (or lazy-load
+  via `TextureLoader`) and assign the map later — on real ports the late upload path has
+  rendered black/white. Create a `CanvasTexture` from the procedural coin canvas WITH the
+  material, and when live art arrives repaint the same canvas in place + `needsUpdate` —
+  no material recompile, no fresh GPU handle.
+- Upstream games often log pre-existing console errors. Verify against the un-ported tree
+  (same count, stash your changes), then allowlist that exact message prefix in qa.mjs with
+  a comment recording the verification — never blanket-ignore console errors.
+
 ## Zip/CSP gotchas
 
 - `base: './'` or every asset 404s on the host's content-addressed prefix.
