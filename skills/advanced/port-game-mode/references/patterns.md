@@ -61,6 +61,36 @@ quiet open, one spike around 30–45 % in, a late rally. Trades come from **name
 rivals** (see below) so the chart dots and the feed share a cast. Pattern in
 `templates/room.js`.
 
+## The claim seam must be LEGIBLE, not merely correct
+
+Hooking the game's own scoring events is the start, not the end: many games score on rules
+the player cannot see. A rally validates waypoints from a 150-200 m radius — hooking that
+paid the player "randomly", nowhere near anything visible. Anchor claims to the VISIBLE
+in-world markers (the gantry the furniture actually stands at, tight pass radius, one claim
+per marker), even when that means bypassing the game's own scoring events. Playtest question:
+"did the award land exactly when it looked like it should?" Prefer sparse, high-value,
+physically-marked events over frequent invisible ones — three $20 gates beat ten radius
+pings.
+
+## Wayfinding: a world-space plane with a constrained billboard
+
+If the port adds a "where do I go" pointer, the playtested winner is a big flat arrow
+(canvas-textured plane, thick dark outline) floating above the player IN THE WORLD, yawed at
+the target — direction reads the way a painted road arrow does. Two failure modes and their
+fixes, all tried: solid 3D meshes (cones, extrusions) degenerate at some camera angle; a
+screen-space HUD arrow is legible but ambiguous (rotation on the glass doesn't say which dune
+to aim at). The plane needs a CONSTRAINED BILLBOARD: the tip's world direction is sacred, but
+roll the face toward the camera about the pointing axis, plus a small fixed nose-down for the
+dead-ahead case a plane can never face. Expect to flip the roll sign once — verify with an
+abeam-target screenshot, not by reasoning.
+
+## Games that don't free-run headless
+
+Some games deliberately never start their loop under `navigator.webdriver` (deterministic
+capture policy). If the world is frozen in headless QA with no errors, look for that gate
+before debugging: drive verification through the game's own stepping hooks
+(`engine.step(n)`-style) and render one frame explicitly for screenshots.
+
 ## Fixture rivals (the leaderboard cast)
 
 A solo room must still feel like a race. Give the launch 4–8 named rivals; their scores
@@ -145,6 +175,47 @@ window.__gm = {
 
 And support URL params: `?practice=SECONDS` (practice window length) and `?round=SECONDS`
 (window length) — mock-only, so short rounds and instant tip-offs are reachable in tests.
+
+## Framing DOM gotchas (learned the hard way)
+
+- A container styled `display: grid/flex` silently defeats the `hidden` attribute — the UA's
+  `display: none` loses the cascade. Always include `[hidden] { display: none !important; }`
+  (or equivalent) in the framing stylesheet, or every overlay "hides" while staying visible.
+- In-world coin branding on three.js: do NOT create an empty `THREE.Texture` (or lazy-load
+  via `TextureLoader`) and assign the map later — on real ports the late upload path has
+  rendered black/white. Create a `CanvasTexture` from the procedural coin canvas WITH the
+  material, and when live art arrives repaint the same canvas in place + `needsUpdate` —
+  no material recompile, no fresh GPU handle.
+- Upstream games often log pre-existing console errors. Verify against the un-ported tree
+  (same count, stash your changes), then allowlist that exact message prefix in qa.mjs with
+  a comment recording the verification — never blanket-ignore console errors.
+
+## Feel layers over simulation
+
+When a reviewer asks for game-feel the simulation does not model (gear changes over a CVT,
+recoil, weight shifts), reach for INPUT SHAPING + AUDIO before physics surgery: derive the
+stepped state from observable sim values (speed bands with hysteresis), play a sound on each
+transition, and express the physical consequence as a brief input modification (a 240 ms
+throttle cut) — the real simulation then produces the audible/visible response itself. Two
+rules from practice: time such effects in FIXED-STEP TICKS, never wall-clock (under a stepped
+QA harness a 240 ms wall cut lasts whole sim-seconds), and gate them on context the sim knows
+(no cut when coasting, airborne or descending). Snap silently across multi-step jumps —
+a respawn should not machine-gun five shift sounds.
+
+## Tame the offending frequency, don't duck everything
+
+"The sound at X is grating" usually traces to ONE synthesis constant — find the component
+(bandpass centre, harmonic knee, rate map) and retune it, rather than lowering buses. A
+procedural whistle proportional to speed, a brightness knee at held rpm: each was a one-line
+retune once identified, and each sounded like a redesign.
+
+## Event-sound layer over game audio
+
+Ports earn new beats the game never had (claims, buys, countdowns). Give them their own tiny
+sample player (own AudioContext, gesture-unlocked, `navigator.webdriver` opts out) with
+generated samples, rather than threading new events through the game's audio engine. Duck the
+game's own buses at state changes it never modelled (e.g. engine/surface down while airborne,
+wind bed in) — the port's loudest "sound design" win is usually one such transition.
 
 ## Zip/CSP gotchas
 

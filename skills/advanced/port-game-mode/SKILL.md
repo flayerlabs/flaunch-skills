@@ -138,7 +138,9 @@ render as "reserved until…" from `holdExpiresAt`, never as a silently smaller 
 - Zero external requests: bundle all assets; images as data/blob URLs (host CSP is
   `img-src 'self' data: blob:`). No CDN scripts, no web fonts, no analytics.
 - Copy `references/AGENTS.md` into the port's root as `AGENTS.md`.
-- Build, then `cd dist && zip -qr ../<name>.zip .` — the zip must stay under 20 MB.
+- Build, then `cd dist && zip -qr ../<name>.zip . -x "*.map"` (never ship sourcemaps). The
+  platform's hard cap is 100 MB; stay well under it, and treat anything over ~20 MB as a
+  prompt to check what's shipping (an asset library can justify it, sourcemaps cannot).
 
 ## Acceptance
 
@@ -149,7 +151,7 @@ A port is done when all of these hold, and not before:
 - [ ] Every item in `references/launch-ux.md` checked, with its `data-gm-*` contract met
 - [ ] `qa-gamemode.mjs` green; screenshots reviewed by a human (or reported for review)
 - [ ] Held allowance (`heldWei` + `holdExpiresAt`) renders as reserved, not vanished
-- [ ] Zip built from relative base, ≤ 20 MB, zero external requests
+- [ ] Zip built from relative base, no sourcemaps, ≤ 100 MB (platform cap), zero external requests
 
 If the game genuinely cannot satisfy the interface (needs a server, has no bounded scoring
 rhythm, can't run headless), stop and say so explicitly — a clear "not portable because X"
