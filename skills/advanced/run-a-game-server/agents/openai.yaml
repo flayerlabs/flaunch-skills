@@ -1,0 +1,4 @@
+interface:
+  display_name: "Run a Game Server"
+  short_description: "Wire an authoritative multiplayer server into Game Mode"
+  default_prompt: "Use $run-a-game-server to connect this game's own server to its Game Mode gate, /config, join tickets and platform submission."

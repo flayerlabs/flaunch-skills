@@ -65,6 +65,12 @@ If the user wants to port, retrofit, or game-mode-enable an existing open-source
 
 For building a Game Mode from scratch or changing rules in an existing one, use the `build-game-mode` skill shipped inside the `@flayerlabs/gamemode-cli` npm package instead.
 
+### Game Mode with its own multiplayer server
+
+If the game runs its own authoritative realtime server or region fleet (custom netcode, Colyseus, Socket.IO, raw WebSockets) and needs the gate, `/config`, join tickets and the platform submission to line up, use:
+
+- `../skills/advanced/run-a-game-server/SKILL.md`
+
 ## Routing Rules
 
 - Start with the smallest skill that can finish the task.
