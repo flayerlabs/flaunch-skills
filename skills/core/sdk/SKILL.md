@@ -647,7 +647,7 @@ const hash = await flaunch.flaunchIPFS({
   creator,
   fairLaunchPercent: 0,
   fairLaunchDuration: 30 * 60,
-  initialMarketCapUSD: 10_000,
+  initialMarketCapUSD: 4_000,
   creatorFeeAllocationPercent: 80,
   metadata: { base64Image, description },
 })
