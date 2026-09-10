@@ -119,9 +119,9 @@ export class CoinPanel {
     this.el.window.textContent = `CLOSES ${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   }
 
-  /** Dollars from wei at the round's own entitlement rate (mock rate: 1 point = $1). */
-  usd(wei) {
-    return Number(wei / (this.room.economy.current().unitsPerPoint ?? 10_000_000_000_000n));
+  /** Dollars from spend-token base units at the round's own entitlement rate (mock rate: 1 point = $1). */
+  usd(units) {
+    return Number(units / (this.room.economy.current().unitsPerPoint ?? 10_000_000_000_000n));
   }
 
   renderEconomy() {
