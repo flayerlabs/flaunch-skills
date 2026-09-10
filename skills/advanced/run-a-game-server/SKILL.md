@@ -85,6 +85,17 @@ coin launched through your game is unplayable. `walletCap` must cover a flawless
 Check: `curl https://<your-gate>/config` returns JSON with your `chainId` and `signer`, and
 `curl https://<your-gate>/health` returns `{"ok":true}`.
 
+## Pairings: do not list tokens
+
+A coin can be paired with ETH or with any token the chain's PairedTokenRegistry approves. From
+`@flayerlabs/gamemode-gate` 0.5.6 a gate on a v1.3 stack prices whichever token a launch arrives
+with by itself: `startGate()` reads the registry from the PositionManager and quotes the token
+through the calculator it was registered with. `createGameServerGate()` gets the same behaviour by
+passing a `RegistryPrices` instance's `priceFor` as `priceFor` and serving `announceSpendToken`, so
+`GET /config/spend-tokens/<token>` answers the launch form for any pairing. Do not maintain a
+`SPEND_TOKENS` list; it exists only to pin a price. A token the registry does not approve is
+refused with 409, as the launch itself would have been.
+
 ## Point the gate's environment at the right origins
 
 The two origin settings developers most often get backwards:
