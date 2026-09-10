@@ -2,7 +2,7 @@ import { createMockRoom, replayMarket } from '@flayerlabs/gamemode-client';
 import { rules } from '../game/rules.ts';
 
 // The mock's entitlement rate is 1 rules point = $1 of allocation. The client never
-// hardcodes it: read `weiPerPoint` from the economy balance.
+// hardcodes it: read `unitsPerPoint` from the economy balance.
 /** TODO: the three economy numbers you designed in step 2 of the skill. */
 const CONFIG = {
   pointsPerGamePoint: 10,
@@ -41,7 +41,7 @@ function launchMarket() {
     afterMs: 20_000 + i * gap,
     player: name,
     side: 'buy',
-    spendWei: BigInt(6 + ((i * 11) % 34)) * 1_000_000_000_000_000n,
+    spend: BigInt(6 + ((i * 11) % 34)) * 1_000_000_000_000_000n,
     priceEth: prices[Math.min(prices.length - 1, i * 8)].priceEth,
   }));
   return { marketCapUsd: 262_000, prices, trades };

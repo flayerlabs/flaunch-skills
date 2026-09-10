@@ -65,7 +65,11 @@ export class CoinPanel {
       for (const t of m.trades) {
         if (this.seenTrades.has(t.id)) continue;
         this.seenTrades.add(t.id);
-        const usd = Math.round((Number(t.spendWei) / 1e18) * 3500);
+        // Trades are in base units of the round's spend token, so the token's own decimals turn
+        // them into whole tokens and its own price turns those into dollars. There is no 1e18
+        // anywhere: that is only right for ETH.
+        const terms = this.room.terms.current();
+        const usd = Math.round((Number(t.spend) / 10 ** terms.spendToken.decimals) * terms.usdPerSpendToken);
         this.addFeed(`${t.player ?? 'someone'} ${t.side === 'buy' ? 'bought' : 'sold'} $${usd} of ${this.ticker}`);
       }
     });
@@ -117,14 +121,14 @@ export class CoinPanel {
 
   /** Dollars from wei at the round's own entitlement rate (mock rate: 1 point = $1). */
   usd(wei) {
-    return Number(wei / (this.room.economy.current().weiPerPoint ?? 10_000_000_000_000n));
+    return Number(wei / (this.room.economy.current().unitsPerPoint ?? 10_000_000_000_000n));
   }
 
   renderEconomy() {
     const e = this.room.economy.current();
-    const available = this.usd(e.availableWei);
-    const spent = this.usd(e.spentWei);
-    const held = this.usd(e.heldWei);
+    const available = this.usd(e.available);
+    const spent = this.usd(e.spent);
+    const held = this.usd(e.held);
     const closed = this.room.launch.current().closesAt - this.room.now() <= 0;
     this.el.alloc.textContent = `$${available}`;
     this.el.buy.disabled = available <= 0 || this.buying || closed;
@@ -155,7 +159,7 @@ export class CoinPanel {
       if (r.bought) {
         this.ownBuyAts.push(this.room.now());
         this.drawChart();
-        this.addFeed(`you bought $${this.usd(r.spentWei)} of ${this.ticker} ✅`, true);
+        this.addFeed(`you bought $${this.usd(r.spent)} of ${this.ticker} ✅`, true);
       } else {
         this.addFeed(`not bought: ${r.reason}`, true);
       }
@@ -184,9 +188,12 @@ export class CoinPanel {
     const market = this.lastMarket;
     if (!market) return;
     const prices = market.prices;
-    if (market.marketCapUsd !== null && prices.length > 1) {
-      const factor = prices[prices.length - 1].priceEth / prices[0].priceEth;
-      this.el.mcap.textContent = `MCAP $${Math.round((market.marketCapUsd * factor) / 1000)}K`;
+    // As given, never scaled. `marketCapUsd` is the platform's current figure for the coin —
+    // the same number the page shows beside the game — so multiplying it by the round's price
+    // change would count that move twice and disagree with the page on screen. It also renders
+    // with no price history at all, because a market cap does not need a chart to be true.
+    if (market.marketCapUsd !== null) {
+      this.el.mcap.textContent = `MCAP $${Math.round(market.marketCapUsd / 1000)}K`;
     }
     const ctx = this.el.chart.getContext('2d');
     if (!ctx || prices.length < 2) return;
