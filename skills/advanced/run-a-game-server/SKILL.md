@@ -2,13 +2,14 @@
 name: run-a-game-server
 description: Connects a game with its own authoritative multiplayer server to Flaunch Game Mode with @flayerlabs/gamemode-gate. Use when a game runs its own realtime server or region fleet (custom netcode, Colyseus, Socket.IO, raw WebSockets) and needs the gate, /config, join tickets, awards and the platform submission to line up. Do not use for rules-based games with no server — $build-game-mode covers those.
 ---
+<!-- vendored_from: flayerlabs/gamemode-sdk@v0.5.5 .agents/skills/run-a-game-server (dashboard facts applied 2026-09-10) -->
 
 # Run a game server behind a Game Mode gate
 
 You have a game whose gameplay lives on your own server. The platform never hosts or relays your
 realtime traffic: you run the server and the gate, and the platform gives your hosted game a strict
 policy that only reaches what you declared. This skill exists because that declaration lives in
-three places that must agree, and because the launch form refuses a gate that does not announce
+three places that must agree, and because the dashboard refuses a gate that does not announce
 itself. Work through the sections in order; each ends with a check you can run.
 
 ## Know the three services and who hosts them
@@ -27,8 +28,9 @@ itself. Work through the sections in order; each ends with a check you can run.
 
 The reviewed game-server origins must match exactly — same scheme, same host, no path — in:
 
-1. The platform submission form's game server addresses field (one per line). This becomes your
-   hosted game's `connect-src`: the browser can only reach origins listed here or your gate.
+1. The game server addresses field of the developer dashboard at
+   `https://flaunch.gg/game-mode/dashboard` (one per line). This becomes your hosted game's
+   `connect-src`: the browser can only reach origins listed here or your gate.
 2. `gameServerOrigins` in your `createGameServerGate()` options. This puts each origin into the
    set of valid join-ticket audiences.
 3. The `joinTicket(origin)` call in your game client and the `audience` your server verifies.
@@ -39,14 +41,15 @@ wrong in (3) and verification rejects every player. At most four origins, exact 
 wildcards, paths and plain HTTP are refused. Rotating regions? Put them behind stable hostnames;
 the list is not meant to churn.
 
-## Serve /config, or the launch form refuses your gate
+## Serve /config, or the dashboard refuses your gate
 
-The launch page reads `GET /config` from your gate before it lets anyone launch a coin through
-your game. `startGate()` serves it automatically; `createGameServerGate()` serves it only when
-you pass `announce`. Without it the form reports your server "isn't answering — it may be offline,
+The dashboard reads `GET /config` from your gate when you declare it, and the launch page reads it
+again before it lets anyone launch a coin through your game. `startGate()` serves it automatically; `createGameServerGate()` serves it only when
+you pass `announce`. Without it the dashboard reports your server "isn't answering — it may be offline,
 or built before the current Game Mode SDK". Pass it:
 
 ```ts
+// Base Sepolia (84532) — the TESTNET example. Production chains announce their own pair; see below.
 const app = createGameServerGate({
   // ...pool, sessions, claims, discovery, settlement, gameId, awardToken...
   gameServerOrigins: ['https://us.game.example.com', 'https://eu.game.example.com'],
@@ -58,11 +61,11 @@ const app = createGameServerGate({
     },
     signer: SIGNER_ADDRESS, // the address of your gate's signing key
     settler: SIGNER_ADDRESS,
-    walletCapWei: '25000000000000000',
+    walletCap: '25000000000000000',
     roundDurationMs: 90_000,
     minLobbyLeadMs: 60_000,
     gateEndsAtGraceS: 10,
-    flaunchVariant: 'legacy11',
+    flaunchVariant: 'v1_2',
     requiresEoa: false,
     accepting: true,
     publicLaunchesOpen: true,
@@ -71,9 +74,12 @@ const app = createGameServerGate({
 })
 ```
 
-The addresses above are Base Sepolia (chain 84532), read back from the chain. `signer` is what a
+The addresses above are Base Sepolia (chain 84532), read back from the chain, and `v1_2` is that
+stack's generation. A Base mainnet (8453) gate announces `chainId: 8453`, `flaunchVariant: 'v1_3'`
+and the V1_3 PositionManager and spend-gated calculator deployed there — read them back from the
+chain, never copy the Sepolia pair. One gate process serves one chain. `signer` is what a
 launch writes into its pool as the trusted signer — announce an address you do not hold and every
-coin launched through your game is unplayable. `walletCapWei` must cover a flawless round
+coin launched through your game is unplayable. `walletCap` must cover a flawless round
 (`maxPointsPerPlayer` times the wei value of a point) or boot refuses.
 
 Check: `curl https://<your-gate>/config` returns JSON with your `chainId` and `signer`, and
@@ -97,6 +103,34 @@ The two origin settings developers most often get backwards:
 Generate the signing key, session secret (32+ characters) and award token (32+ characters,
 `openssl rand -hex 32`) fresh per environment. The award token lives on the gate and your game
 server only; it never reaches a browser or a zip.
+
+## Wire the market
+
+`joinEconomy()` does not find the market on its own. Hand it the one the embedding page pushes,
+or the game has nothing to draw:
+
+```ts
+const embedded = await connectHost()
+const gameMode = await joinEconomy({
+  gateUrl: embedded.context.gateUrl,
+  roundId: embedded.context.roundId,
+  host: embedded.host,
+  platform: { market: embedded.market }, // omit this and economy.market stays `unavailable`
+})
+```
+
+The gate never sends market state, so waiting for it on the live socket waits forever. Subscribe
+to `gameMode.market` for the chart and `marketCapUsd`; a page that pushes nothing leaves the
+status at `unavailable`, which is the cue to draw an empty chart rather than a spinner.
+
+Plot `prices[].marketCapUsd` rather than deriving market cap from price. Supply is the platform's
+to know — a launch may carry an override, or count circulating against total — and a game that
+assumes it shows a number contradicting the page around it. Fall back to a price axis when the
+field is absent.
+
+When a buy fails, log `result.refuse` and `result.detail` with `result.transactionHash`. `reason`
+is the player's answer and collapses several situations into `try-again`; those three say which
+one, and which side of the bridge it happened on.
 
 ## Wire the ticket handshake
 
@@ -134,8 +168,12 @@ bundle contains none of them.
 
 ## Submit, then verify against the real policy
 
-Submit the zip with the gate option on (your gate origin) and the game server addresses filled in.
-The form live-probes your gate's `/health` at submission, so deploy the gate first. Localhost
+Upload the zip in the developer dashboard at `https://flaunch.gg/game-mode/dashboard`, declare
+your gate origin as a network — one gate per chain: Base Sepolia (84532) is required for testing,
+Base (8453) and Robinhood (4663) are production — and fill in the game server addresses. The
+dashboard live-probes `/health` at submission, so deploy the gate first; it refuses builds below
+`@flayerlabs/gamemode-client` 0.5.5 and gates whose `/config` `gateVersion` is below 0.5.5. Mark
+the game mobile-friendly if it is, and run the Base Sepolia test launch from the dashboard. Localhost
 cannot rehearse the deployed CSP: after hosting, open the deployed game and confirm every declared
 origin connects and an undeclared one is blocked. Then launch a fresh test coin through the room
 link — a coin launched before a registration change stays bound to what it was launched with.

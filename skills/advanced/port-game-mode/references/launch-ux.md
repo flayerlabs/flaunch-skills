@@ -114,10 +114,10 @@ drives — pointer-type gates and key-ramp overrides are exactly where it breaks
 
 BUY is sprung at a beat — a reveal, the end screen, a last call — and warned before it
 opens a wallet. Render `signing`/`pending` as a visible status, never a blocking modal;
-render a declined buy's held allowance as "reserved until…" from the balance's `heldWei` +
+render a declined buy's held allowance as "reserved until…" from the balance's `held` +
 `holdExpiresAt`; keep the button single-flight (a second buy while one is in the wallet is
 refused with `try-again`).
 
 - Contract: `data-buy` (from the coin panel) and `data-hold` for the confirmed/held line.
-- Accept: a buy confirms into "you hold $X"; a nonzero `heldWei` reads as "reserved until…",
+- Accept: a buy confirms into "you hold $X"; a nonzero `held` reads as "reserved until…",
   never as a vanished balance.

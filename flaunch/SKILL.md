@@ -1,6 +1,6 @@
 ---
 name: flaunch
-description: Build with Flaunch. Use when the user wants to launch a token, build a launchpad, integrate the SDK or Web2 API, design a treasury manager, or create a manager-bound wrapper zap.
+description: Build with Flaunch. Use when the user wants to launch a token, build a launchpad, integrate the SDK or Web2 API, design a treasury manager, create a manager-bound wrapper zap, or build, port or serve a Game Mode game.
 ---
 
 # Flaunch
@@ -57,19 +57,25 @@ If the user needs a launch flow that forces manager defaults through a wrapper z
 
 - `../skills/advanced/manager-zap-wrapper/SKILL.md`
 
-### Game Mode port
+### Game Mode
 
-If the user wants to port, retrofit, or game-mode-enable an existing open-source browser game so it attaches to a token launch (coin metadata, chart, buying, launch framing), use:
+Games attached to a token launch. Three skills, vendored from `flayerlabs/gamemode-sdk` at a tag:
 
-- `../skills/advanced/port-game-mode/SKILL.md`
+- Build a Game Mode from scratch, or change the rules of an existing one:
+  `../skills/advanced/build-game-mode/SKILL.md`
+- Port an existing open-source browser game so it attaches to a launch:
+  `../skills/advanced/port-game-mode/SKILL.md`
+- The game runs its own authoritative multiplayer server (custom netcode, Colyseus, Socket.IO,
+  raw WebSockets) and needs the gate, `/config`, join tickets and the dashboard submission to
+  line up: `../skills/advanced/run-a-game-server/SKILL.md`
 
-For building a Game Mode from scratch or changing rules in an existing one, use the `build-game-mode` skill shipped inside the `@flayerlabs/gamemode-cli` npm package instead.
+Each installs on its own:
 
-### Game Mode with its own multiplayer server
-
-If the game runs its own authoritative realtime server or region fleet (custom netcode, Colyseus, Socket.IO, raw WebSockets) and needs the gate, `/config`, join tickets and the platform submission to line up, use:
-
-- `../skills/advanced/run-a-game-server/SKILL.md`
+```bash
+npx skills add https://github.com/flayerlabs/flaunch-skills --skill build-game-mode
+npx skills add https://github.com/flayerlabs/flaunch-skills --skill port-game-mode
+npx skills add https://github.com/flayerlabs/flaunch-skills --skill run-a-game-server
+```
 
 ## Routing Rules
 
@@ -77,6 +83,7 @@ If the game runs its own authoritative realtime server or region fleet (custom n
 - Use the basic skills first when the user wants speed and minimal decisions.
 - Switch to the core skills when the user needs direct API, SDK, or manager details.
 - Use the advanced skills only when the product requires custom treasury behavior or manager-bound launch constraints.
+- Game Mode requests go straight to the matching Game Mode skill; they do not pass through the token or launchpad skills.
 
 ## Install Shape
 

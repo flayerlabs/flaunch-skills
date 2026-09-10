@@ -88,7 +88,7 @@ try {
   // a practice claim must NOT award
   await page.evaluate(() => window.__gm.claim());
   await page.waitForTimeout(300);
-  const practiceEarned = await page.evaluate(() => window.__gm.room.economy.current().earnedWei > 0n);
+  const practiceEarned = await page.evaluate(() => window.__gm.room.economy.current().earned > 0n);
   check('practice claim does not award', !practiceEarned);
 
   // wait for the round to open
@@ -100,11 +100,11 @@ try {
   // claim → award; instant re-claim → refusal
   await page.evaluate(() => window.__gm.claim());
   await page.waitForTimeout(300);
-  const earned = await page.evaluate(() => { const e = window.__gm.room.economy.current(); return Number(e.earnedWei / (e.weiPerPoint ?? 10_000_000_000_000n)); });
+  const earned = await page.evaluate(() => { const e = window.__gm.room.economy.current(); return Number(e.earned / (e.unitsPerPoint ?? 10_000_000_000_000n)); });
   check('claim awards allocation', earned > 0, `$${earned}`);
   await page.evaluate(() => window.__gm.claim());
   await page.waitForTimeout(300);
-  const earned2 = await page.evaluate(() => { const e = window.__gm.room.economy.current(); return Number(e.earnedWei / (e.weiPerPoint ?? 10_000_000_000_000n)); });
+  const earned2 = await page.evaluate(() => { const e = window.__gm.room.economy.current(); return Number(e.earned / (e.unitsPerPoint ?? 10_000_000_000_000n)); });
   check('instant re-claim refused', earned2 === earned);
 
   // chart + standings
