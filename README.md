@@ -128,6 +128,16 @@ This repository is organized into three groups:
 | `skills/advanced/manager-builder/SKILL.md` | Custom treasury manager build skill. | You need to design, integrate, or test manager-driven treasury behavior. |
 | `skills/advanced/manager-zap-wrapper/SKILL.md` | Custom wrapper zap skill for manager-based launches. | You need a launch flow that forces manager defaults through `FlaunchZap` or binds launches to a project-specific manager path. |
 
+### Game Mode
+
+Games attached to a token launch. These three skills are vendored from `flayerlabs/gamemode-sdk` at a tag (`scripts/sync-gamemode-skills.sh` refreshes them); `integrate-game-mode-platform` is deliberately not vendored — it is for platform owners, not game developers.
+
+| File | Purpose | Read when... |
+|------|---------|--------------|
+| `skills/advanced/build-game-mode/SKILL.md` | Build a Game Mode from scratch or change its rules. | You are writing rules, actions, views, scoring or mock-room play for a new or generated game. |
+| `skills/advanced/port-game-mode/SKILL.md` | Port an existing open-source browser game. | You have a game repo and want it attached to a launch, through to the uploadable zip and dashboard submission. |
+| `skills/advanced/run-a-game-server/SKILL.md` | Wire a game's own multiplayer server into Game Mode. | The game runs its own realtime server and needs the gate, `/config`, join tickets and submission to agree. |
+
 ## Source Repositories
 
 These skills are derived from the current Flaunch codebases:
@@ -135,3 +145,4 @@ These skills are derived from the current Flaunch codebases:
 - `flaunch-sdk`
 - `flaunch-contracts`
 - `flaunch-web2-api`
+- `gamemode-sdk` (Game Mode skills, vendored at a tag)
